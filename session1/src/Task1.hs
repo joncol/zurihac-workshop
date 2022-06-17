@@ -2,6 +2,8 @@
 
 module Task1 where
 
+import Data.Function ((&))
+import Data.MultiSet ((\\))
 import qualified Data.MultiSet as MS
 import Data.Text (Text)
 import GHC.Generics (Generic)
@@ -116,6 +118,11 @@ enoughEnergy energyCost attached = MS.fromList energyCost `MS.isSubsetOf` energi
   where
     energies = MS.fromList $ [c | EnergyCard c <- attached]
 
--- Then, refine it to return the missing energy
+-- | Return the missing energy, if any.
 missingEnergy :: [Energy] -> [Card] -> Maybe [Energy]
-missingEnergy cost attached = _
+missingEnergy energyCost attached
+  | null diff = Nothing
+  | otherwise = Just diff
+  where
+    energies = MS.fromList $ [c | EnergyCard c <- attached]
+    diff = MS.fromList energyCost \\ energies & MS.toList

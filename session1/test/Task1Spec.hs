@@ -39,4 +39,28 @@ spec_enoughEnergy = describe "enoughEnergy" $ do
           , goomy
           , eevee
           ]
-    enoughEnergy [Grass, Fire, Fire, Water] cards `shouldBe` False
+    enoughEnergy [Grass, Fire, Fire, Water, Water] cards `shouldBe` False
+
+spec_missingEnergy :: Spec
+spec_missingEnergy = describe "missingEnergy" $ do
+  it "returns `Nothing` when hand has enough energy cards to cover cost" $ do
+    let cards =
+          [ EnergyCard Grass
+          , EnergyCard Fire
+          , EnergyCard Water
+          , grookey
+          , goomy
+          , eevee
+          ]
+    missingEnergy [Grass, Fire, Water] cards `shouldBe` Nothing
+
+  it "returns the missing `Energy` when hand does not have enough energy cards to cover cost" $ do
+    let cards =
+          [ EnergyCard Grass
+          , EnergyCard Fire
+          , EnergyCard Water
+          , grookey
+          , goomy
+          , eevee
+          ]
+    missingEnergy [Grass, Fire, Fire, Water, Water] cards `shouldBe` Just [Fire, Water]
