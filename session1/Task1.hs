@@ -36,15 +36,66 @@ data Attack = Attack
 
 -- | https://pokemoncard.io/card/?search=swsh1-11
 grookey :: Card
-grookey = _
+grookey =
+  PokemonCard
+    { name = "Grookey"
+    , typ = Grass
+    , hp = 70
+    , attacks =
+        [ Attack
+            { attackName = "Scratch"
+            , cost = [Colorless]
+            , damage = 10
+            }
+        , Attack
+            { attackName = "Beat"
+            , cost = [Grass, Colorless]
+            , damage = 20
+            }
+        ]
+    }
 
 -- | https://pokemoncard.io/card/?search=swsh8-195
 goomy :: Card
-goomy = _
+goomy =
+  PokemonCard
+    { name = "Goomy"
+    , typ = Dragon
+    , hp = 50
+    , attacks =
+        [ Attack
+            { attackName = "Tackle"
+            , cost = [Colorless]
+            , damage = 10
+            }
+        , Attack
+            { attackName = "Melt"
+            , cost = [Water, Psychic]
+            , damage = 20
+            }
+        ]
+    }
 
 -- | https://pokemoncard.io/card/?search=swsh4-130
 eevee :: Card
-eevee = _
+eevee =
+  PokemonCard
+    { name = "Eevee"
+    , typ = Colorless
+    , hp = 70
+    , attacks =
+        [ Attack
+            { attackName = "Gnaw"
+            , cost = [Colorless]
+            , damage = 10
+            }
+        , Attack
+            { attackName = "Tail Whap"
+            , cost = [Colorless, Colorless]
+            , damage = 20
+            }
+        ]
+    }
 
 {- | Check whether some energy cards are enough to
    "pay" for the cost of an attack
