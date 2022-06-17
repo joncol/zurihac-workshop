@@ -114,9 +114,13 @@ eevee =
    "pay" for the cost of an attack
 -}
 enoughEnergy :: [Energy] -> [Card] -> Bool
-enoughEnergy energyCost attached = MS.fromList energyCost `MS.isSubsetOf` energies
+enoughEnergy energyCost attached =
+  length energyCost <= length energyCards
+    && MS.fromList energyCostColored `MS.isSubsetOf` coloredCards
   where
-    energies = MS.fromList $ [c | EnergyCard c <- attached]
+    energyCostColored = [c | c <- energyCost, c /= Colorless]
+    energyCards = [c | EnergyCard c <- attached]
+    coloredCards = MS.fromList [c | c <- energyCards, c /= Colorless]
 
 -- | Return the missing energy, if any.
 missingEnergy :: [Energy] -> [Card] -> Maybe [Energy]

@@ -8,7 +8,7 @@ import Test.Tasty.Hspec
 import Test.Tasty.QuickCheck
 
 import Task1
-import Task1 (goomy)
+import Task1 (Energy (Colorless, Lightning), goomy)
 
 prop_enoughEnergyAlwaysReturnsTrueWhenCostIsZero :: [Card] -> Bool
 prop_enoughEnergyAlwaysReturnsTrueWhenCostIsZero = enoughEnergy []
@@ -40,6 +40,30 @@ spec_enoughEnergy = describe "enoughEnergy" $ do
           , eevee
           ]
     enoughEnergy [Grass, Fire, Fire, Water, Water] cards `shouldBe` False
+
+  it "allows any energy card to cover a `Colorless` cost" $ do
+    let cards =
+          [ EnergyCard Grass
+          , EnergyCard Fire
+          , EnergyCard Water
+          , EnergyCard Lightning
+          , grookey
+          , goomy
+          , eevee
+          ]
+    enoughEnergy [Grass, Fire, Water, Colorless] cards `shouldBe` True
+
+  it "returns `False` when there are not enough cards to cover the `Colorless` cost" $ do
+    let cards =
+          [ EnergyCard Grass
+          , EnergyCard Fire
+          , EnergyCard Water
+          , EnergyCard Lightning
+          , grookey
+          , goomy
+          , eevee
+          ]
+    enoughEnergy [Grass, Fire, Water, Colorless, Colorless] cards `shouldBe` False
 
 spec_missingEnergy :: Spec
 spec_missingEnergy = describe "missingEnergy" $ do
