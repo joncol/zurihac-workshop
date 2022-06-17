@@ -1,24 +1,36 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module Task1 where
 
 import Data.Text
 import GHC.Natural
 
-data Energy = Colorless
-            | Grass | Fire | Water
-            | Lightning | Fighting | Psychic
-            | Darkness | Metal | Dragon
+data Energy
+  = Colorless
+  | Grass
+  | Fire
+  | Water
+  | Lightning
+  | Fighting
+  | Psychic
+  | Darkness
+  | Metal
+  | Dragon
 
-data Card = PokemonCard { name    :: Text
-                        , typ     :: Energy
-                        , hp      :: Natural
-                        , attacks :: [Attack] }
-          | EnergyCard  { typ     :: Energy }
+data Card
+  = PokemonCard
+      { name :: Text
+      , typ :: Energy
+      , hp :: Natural
+      , attacks :: [Attack]
+      }
+  | EnergyCard {typ :: Energy}
 
-data Attack = Attack { attackName :: Text
-                     , cost       :: [Energy]
-                     , damage     :: Natural }
-
+data Attack = Attack
+  { attackName :: Text
+  , cost :: [Energy]
+  , damage :: Natural
+  }
 
 -- Define values for the following cards
 
@@ -34,9 +46,9 @@ goomy = _
 eevee :: Card
 eevee = _
 
-
--- | Check whether some energy cards are enough to
---   "pay" for the cost of an attack
+{- | Check whether some energy cards are enough to
+   "pay" for the cost of an attack
+-}
 enoughEnergy :: [Energy] -> [Card] -> Bool
 enoughEnergy cost attached = _
 
