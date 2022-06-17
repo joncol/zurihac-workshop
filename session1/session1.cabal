@@ -11,7 +11,12 @@ extra-source-files: README.md
 common common-options
   build-depends:      base >=4.9 && <5
   default-language:   Haskell2010
-  default-extensions: OverloadedStrings
+  default-extensions:
+    DeriveGeneric
+    DerivingStrategies
+    DerivingVia
+    OverloadedStrings
+
   ghc-options:
     -Wall -Wcompat -Widentities -Wincomplete-uni-patterns
     -Wincomplete-record-updates -Wredundant-constraints
@@ -29,11 +34,12 @@ library
 
   -- other-modules:
   build-depends:
-    , base               >=4.14
+    , base                  >=4.14
     , generic-arbitrary
     , monad-loops
     , mtl
-    , random             >=1.2
+    , quickcheck-instances
+    , random                >=1.2
     , tasty
     , tasty-quickcheck
     , text

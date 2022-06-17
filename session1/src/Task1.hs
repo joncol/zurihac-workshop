@@ -3,7 +3,11 @@
 module Task1 where
 
 import Data.Text
+import GHC.Generics (Generic)
 import GHC.Natural
+import Test.QuickCheck.Arbitrary.Generic
+import Test.QuickCheck.Instances.Natural ()
+import Test.QuickCheck.Instances.Text ()
 
 data Energy
   = Colorless
@@ -16,6 +20,8 @@ data Energy
   | Darkness
   | Metal
   | Dragon
+  deriving (Generic, Show)
+  deriving (Arbitrary) via GenericArbitrary Energy
 
 data Card
   = PokemonCard
@@ -25,12 +31,16 @@ data Card
       , attacks :: [Attack]
       }
   | EnergyCard {typ :: Energy}
+  deriving (Generic, Show)
+  deriving (Arbitrary) via GenericArbitrary Card
 
 data Attack = Attack
   { attackName :: Text
   , cost :: [Energy]
   , damage :: Natural
   }
+  deriving (Generic, Show)
+  deriving (Arbitrary) via GenericArbitrary Attack
 
 -- Define values for the following cards
 
@@ -101,7 +111,7 @@ eevee =
    "pay" for the cost of an attack
 -}
 enoughEnergy :: [Energy] -> [Card] -> Bool
-enoughEnergy cost attached = _
+enoughEnergy cost attached = True
 
 -- Then, refine it to return the missing energy
 missingEnergy :: [Energy] -> [Card] -> Maybe [Energy]
