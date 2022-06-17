@@ -8,15 +8,35 @@ import Test.Tasty.Hspec
 import Test.Tasty.QuickCheck
 
 import Task1
-
--- spec_enoughEnergy :: Spec
--- spec_enoughEnergy = describe "enoughEnergy" $ do
---   it "returns `True` when cost is zero" $ do
---     enoughEnergy [] ([Card]) `shouldBe` (23 :: Int)
+import Task1 (goomy)
 
 prop_enoughEnergyAlwaysReturnsTrueWhenCostIsZero :: [Card] -> Bool
-prop_enoughEnergyAlwaysReturnsTrueWhenCostIsZero cards = enoughEnergy [] cards
+prop_enoughEnergyAlwaysReturnsTrueWhenCostIsZero = enoughEnergy []
 
-prop_enoughEnergyAlwaysReturnsFalseForEmptyHandWhenCostIsNonZero :: [Energy] -> Bool
-prop_enoughEnergyAlwaysReturnsFalseForEmptyHandWhenCostIsNonZero cost =
-  not $ enoughEnergy cost []
+prop_enoughEnergyAlwaysReturnsFalseForEmptyHandWhenCostIsNonZero :: NonEmptyList Energy -> Bool
+prop_enoughEnergyAlwaysReturnsFalseForEmptyHandWhenCostIsNonZero (NonEmpty energyCost) =
+  not $ enoughEnergy energyCost []
+
+spec_enoughEnergy :: Spec
+spec_enoughEnergy = describe "enoughEnergy" $ do
+  it "returns `True` when hand has enough energy cards to cover cost" $ do
+    let cards =
+          [ EnergyCard Grass
+          , EnergyCard Fire
+          , EnergyCard Water
+          , grookey
+          , goomy
+          , eevee
+          ]
+    enoughEnergy [Grass, Fire, Water] cards `shouldBe` True
+
+  it "returns `False` when hand does not have enough energy cards to cover cost" $ do
+    let cards =
+          [ EnergyCard Grass
+          , EnergyCard Fire
+          , EnergyCard Water
+          , grookey
+          , goomy
+          , eevee
+          ]
+    enoughEnergy [Grass, Fire, Fire, Water] cards `shouldBe` False

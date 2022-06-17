@@ -15,6 +15,7 @@ common common-options
     DeriveGeneric
     DerivingStrategies
     DerivingVia
+    LambdaCase
     OverloadedStrings
 
   ghc-options:
@@ -38,6 +39,7 @@ library
     , generic-arbitrary
     , monad-loops
     , mtl
+    , multiset
     , quickcheck-instances
     , random                >=1.2
     , tasty

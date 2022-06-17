@@ -2,7 +2,8 @@
 
 module Task1 where
 
-import Data.Text
+import qualified Data.MultiSet as MS
+import Data.Text (Text)
 import GHC.Generics (Generic)
 import GHC.Natural
 import Test.QuickCheck.Arbitrary.Generic
@@ -20,7 +21,7 @@ data Energy
   | Darkness
   | Metal
   | Dragon
-  deriving (Generic, Show)
+  deriving (Generic, Eq, Ord, Show)
   deriving (Arbitrary) via GenericArbitrary Energy
 
 data Card
@@ -111,7 +112,9 @@ eevee =
    "pay" for the cost of an attack
 -}
 enoughEnergy :: [Energy] -> [Card] -> Bool
-enoughEnergy cost attached = True
+enoughEnergy energyCost attached = MS.fromList energyCost `MS.isSubsetOf` energies
+  where
+    energies = MS.fromList $ [c | EnergyCard c <- attached]
 
 -- Then, refine it to return the missing energy
 missingEnergy :: [Energy] -> [Card] -> Maybe [Energy]
