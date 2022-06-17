@@ -1,0 +1,6 @@
+ignore-project: False
+tests: True
+test-options: "--color=always"
+test-show-details: streaming
+package haskell-sandbox
+  ghc-options: -Wwarn -fdefer-typed-holes
