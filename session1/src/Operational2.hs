@@ -1,9 +1,8 @@
-{-# language GADTs #-}
-{-# language RankNTypes #-}
-{-# language LambdaCase #-}
-{-# language DeriveGeneric, DeriveAnyClass #-}
-{-# language ScopedTypeVariables #-}
-{-# language DerivingVia #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Operational2 where
 
 import Control.Monad
@@ -11,25 +10,27 @@ import Control.Monad.Loops
 import Control.Monad.State
 import Data.List (genericLength)
 import Data.Text (Text)
-import GHC.Natural
 import GHC.Generics
+import GHC.Natural
 import System.Random
 import System.Random.Stateful
 
+import Test.QuickCheck.Arbitrary.Generic
 import Test.Tasty
 import Test.Tasty.QuickCheck
-import Test.QuickCheck.Arbitrary.Generic
 
-data FlipOutcome 
-  = Heads | Tails
+data FlipOutcome
+  = Heads
+  | Tails
   deriving (Show, Eq, Generic, Finite, Uniform)
   deriving (Arbitrary) via GenericArbitrary FlipOutcome
 
 data Program instr a where
-  Done   :: a -> Program instr a
-  (:>>=) :: instr a
-         -> (a -> Program instr b)
-         -> Program instr b
+  Done :: a -> Program instr a
+  (:>>=) ::
+    instr a ->
+    (a -> Program instr b) ->
+    Program instr b
 
 data Action a where
   FlipCoin :: Action FlipOutcome
@@ -49,36 +50,41 @@ instance Applicative (Program instr) where
 instance Functor (Program instr) where
   fmap = liftM
 
-interpret :: Monad m 
-          => (forall x. instr x -> m x)
-          -> Program instr a -> m a
+interpret ::
+  Monad m =>
+  (forall x. instr x -> m x) ->
+  Program instr a ->
+  m a
 interpret f = go
   where
     go (Done x) = return x
     go (action :>>= k) = do
       x <- f action
       go (k x)
-      -- f action >>= go . k
+
+-- f action >>= go . k
 
 interpretRandom :: Program Action a -> IO a
 interpretRandom = interpret $ \case
   FlipCoin -> uniformM globalStdGen
 
 interpretPure :: [FlipOutcome] -> Program Action a -> a
-interpretPure outcomes = 
+interpretPure outcomes =
   flip evalState (cycle outcomes) . interpret f
-  where f :: Action x -> State [FlipOutcome] x
-        f FlipCoin = do
-          ~(result : nexts) <- get
-          put nexts
-          return result
+  where
+    f :: Action x -> State [FlipOutcome] x
+    f FlipCoin = do
+      ~(result : nexts) <- get
+      put nexts
+      return result
 
 interpretPure2 :: [FlipOutcome] -> Program Action a -> a
 interpretPure2 outcomes = go (cycle outcomes)
-  where go :: [FlipOutcome] -> Program Action x -> x
-        go _ (Done x) = x
-        go ~(result : nexts) (FlipCoin :>>= k) =
-          go nexts (k result)
+  where
+    go :: [FlipOutcome] -> Program Action x -> x
+    go _ (Done x) = x
+    go ~(result : nexts) (FlipCoin :>>= k) =
+      go nexts (k result)
 
 --- >>> interpretPure [Heads, Heads, Tails] ironTailAction
 -- 60
@@ -95,13 +101,14 @@ ironTailAction2 = do
   pure $ 30 * genericLength heads
 
 tests :: TestTree
-tests = 
-  testGroup "Iron Tail"
-    [ testProperty "non-negative" $ \outcomes -> 
+tests =
+  testGroup
+    "Iron Tail"
+    [ testProperty "non-negative" $ \outcomes ->
         interpretPure (outcomes ++ [Tails]) ironTailAction >= 0
     , testProperty "30 times # of heads" $ \(noOfHeads :: Int) ->
-        noOfHeads > 0 ==>
-          interpretPure (replicate noOfHeads Heads ++ [Tails]) ironTailAction
-            == fromIntegral (noOfHeads * 30)
-    -- write a property for implementations to coincide
+        noOfHeads > 0
+          ==> interpretPure (replicate noOfHeads Heads ++ [Tails]) ironTailAction
+          == fromIntegral (noOfHeads * 30)
+          -- write a property for implementations to coincide
     ]

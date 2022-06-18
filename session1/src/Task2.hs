@@ -1,14 +1,15 @@
-{-# language LambdaCase #-}
-{-# language DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Task2 where
 
-import GHC.Natural
 import GHC.Generics
+import GHC.Natural
 import System.Random
 import System.Random.Stateful
 
-data FlipOutcome 
-  = Heads | Tails
+data FlipOutcome
+  = Heads
+  | Tails
   deriving (Generic, Finite, Uniform)
 
 data Action
@@ -16,14 +17,16 @@ data Action
   | Damage Natural
 
 surpriseAttackAction :: Action
-surpriseAttackAction
-  = FlipCoin $ \case Heads -> Damage 30
-                     Tails -> Damage 0
+surpriseAttackAction =
+  FlipCoin $ \case
+    Heads -> Damage 30
+    Tails -> Damage 0
 
--- | Define Pikachu's "Iron Tail" attack
---
---   > Flip a coin until you get tails.
---   > This attack does 30 damage for each heads.
+{- | Define Pikachu's "Iron Tail" attack
+
+   > Flip a coin until you get tails.
+   > This attack does 30 damage for each heads.
+-}
 ironTailAction :: Action
 ironTailAction = _
 
