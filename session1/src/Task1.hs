@@ -3,6 +3,7 @@
 module Task1 where
 
 import Data.Function ((&))
+import Data.Maybe (isNothing)
 import Data.MultiSet ((\\))
 import qualified Data.MultiSet as MS
 import Data.Text (Text)
@@ -114,19 +115,24 @@ eevee =
    "pay" for the cost of an attack
 -}
 enoughEnergy :: [Energy] -> [Card] -> Bool
-enoughEnergy energyCost attached =
-  length energyCost <= length energyCards
-    && MS.fromList energyCostColored `MS.isSubsetOf` coloredCards
-  where
-    energyCostColored = [c | c <- energyCost, c /= Colorless]
-    energyCards = [c | EnergyCard c <- attached]
-    coloredCards = MS.fromList [c | c <- energyCards, c /= Colorless]
+enoughEnergy energyCost attached = isNothing $ missingEnergy energyCost attached
 
 -- | Return the missing energy, if any.
 missingEnergy :: [Energy] -> [Card] -> Maybe [Energy]
 missingEnergy energyCost attached
-  | null diff = Nothing
-  | otherwise = Just diff
+  | length energyCost <= length energyCards
+      && energyCostColored `MS.isSubsetOf` coloredCards =
+      Nothing
+  | otherwise =
+      Just $
+        missingColoredCards
+          <> replicate missingColorlessCardCount Colorless
   where
-    energies = MS.fromList $ [c | EnergyCard c <- attached]
-    diff = MS.fromList energyCost \\ energies & MS.toList
+    energyCostColored = MS.fromList [c | c <- energyCost, c /= Colorless]
+    energyCostColorless = length [c | c <- energyCost, c == Colorless]
+    energyCards = [c | EnergyCard c <- attached]
+    coloredCards = MS.fromList [c | c <- energyCards, c /= Colorless]
+    colorlessCards = [c | c <- energyCards, c == Colorless]
+    missingColoredCards = energyCostColored \\ coloredCards & MS.toList
+    unusedCardCount = (coloredCards \\ energyCostColored & MS.size) + length colorlessCards
+    missingColorlessCardCount = energyCostColorless - unusedCardCount
