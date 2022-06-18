@@ -10,7 +10,7 @@ import System.Random.Stateful
 data FlipOutcome
   = Heads
   | Tails
-  deriving (Generic, Finite, Uniform)
+  deriving (Show, Generic, Finite, Uniform)
 
 data Action
   = FlipCoin (FlipOutcome -> Action)
@@ -28,11 +28,24 @@ surpriseAttackAction =
    > This attack does 30 damage for each heads.
 -}
 ironTailAction :: Action
-ironTailAction = _
+ironTailAction = buildDamage 0
+  where
+    buildDamage :: Natural -> Action
+    buildDamage n =
+      FlipCoin $ \case
+        Heads -> buildDamage (n + 1)
+        Tails -> Damage $ n * 30
 
 -- | Define the randomness interpretation of 'Action'
 interpretRandom :: Action -> IO Natural
-interpretRandom _ = _
+interpretRandom (FlipCoin f) = do
+  putStrLn "\nflipping coin"
+  coin <- flipCoin
+  putStrLn $ "result: " <> show coin
+  interpretRandom (f coin)
   where
     flipCoin :: IO FlipOutcome
     flipCoin = uniformM globalStdGen
+interpretRandom (Damage n) = do
+  putStrLn $ "Doing damage: " <> show n
+  pure n
