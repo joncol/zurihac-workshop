@@ -7,6 +7,7 @@ module Operational1 where
 import Control.Monad
 import Control.Monad.Loops
 import Data.List (genericLength)
+import Data.Maybe (catMaybes)
 import Data.Text (Text)
 import GHC.Generics
 import GHC.Natural
@@ -114,7 +115,7 @@ ironTailAction2 = do
    than requested, if there were not enough.
 -}
 drawN :: Natural -> Program Action [Card]
-drawN n = _
+drawN n = catMaybes <$> replicateM (fromIntegral n) (perform DrawCard)
 
 {- | Define "Ice Bonus" attacj
 
